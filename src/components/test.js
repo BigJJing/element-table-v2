@@ -3,11 +3,27 @@ import { defineComponent, h } from "vue";
 const MainTable = (props, {
     slots
 }) => {
-    console.log(props)
-    return h(
-        "h2",
-        ["children"]
+    return h("h2",{},
+        {
+            default: slots.header
+        }
     )
+}
+const createTable = ()  => {
+    return defineComponent({
+        name: "custom-table",
+        emits: ["itemRendered"],
+        setup(props, { emit, expose, slots }) {
+            const renderWindow = () => {
+                return h("button",{
+                    innerHTML: "renderWindow",
+                    onClick: () => emit("itemRendered")
+                })
+            }
+            //renderWindow会立刻执行
+            return renderWindow
+        }
+    })
 }
 const MyTable = defineComponent({
     name: "my-table",
@@ -17,20 +33,20 @@ const MyTable = defineComponent({
         expose
     }) {
         return () => {
-            return h(
-                "h1", 
-                {
-                    class: ["a", "b"],
+            return h("h1", {
                     style: {color: '#ccc'},
-                },
-                [
-                    'hello',
-                    h("h2", {innerHTML: 'world'}),
-                    h(MainTable, {class: 'c'})
-                ]
+                    onClick: () => {console.log(1)},
+                },[
+                    h(MainTable, {class: 'c'}, slots),
+                    h(createTable(), {
+                        class: 'a',
+                        onItemRendered: () => {console.log(2)}
+                    }, slots),
+                ],
             )
         }
     }
 })
+
 
 export { MyTable };
