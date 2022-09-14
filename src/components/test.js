@@ -1,12 +1,17 @@
-import { defineComponent, h } from "vue";
+import { defineComponent, h, ref, unref, computed } from "vue";
 //除以下写法之外也可以定义组件defineComponent
 const MainTable = (props, {
     slots
 }) => {
-    return h("h2",{},
-        {
-            default: slots.header
-        }
+    console.log("xxx MainTable");
+    console.log(props)
+    const a = props.a.value;
+    return h("h2",{
+        class: a ? "xxx" : "yyy"
+    },[
+       a ? h("div", null, "hello") : h("div", null, "hi")
+    ]
+    
     )
 }
 const createTable = ()  => {
@@ -27,17 +32,36 @@ const createTable = ()  => {
 }
 const MyTable = defineComponent({
     name: "my-table",
-    props: {},
+    props: {
+        data: Object,
+        num: Object,
+    },
     setup(props, {
         slots,
         expose
     }) {
         return () => {
+            const a = ref(true);
+            setTimeout(() => {
+                console.log("!!!!")
+                a.value = false
+            }, 1000)
+            console.log("MyTable")
+            const {
+                data,
+                num
+            } = props;
+            const mainProps = {
+                data,
+                num,
+                a
+            }
+            
             return h("h1", {
                     style: {color: '#ccc'},
                     onClick: () => {console.log(1)},
                 },[
-                    h(MainTable, {class: 'c'}, slots),
+                    h(MainTable, mainProps),
                     h(createTable(), {
                         class: 'a',
                         onItemRendered: () => {console.log(2)}

@@ -1,5 +1,9 @@
 <template>
-  <MyTable>
+  <div>
+    <button @click="add">start add</button>
+    <button @click="stop">stop add</button>
+  </div>
+  <MyTable :data="data" :num="num">
     <template #header>
       <div>header</div>
     </template>
@@ -17,22 +21,16 @@
     fixed
   >
   </el-table-v2>
-    <!-- <el-table-v2
-        :columns="columns"
-        :data="data"
-        :width="700"
-        :height="400"
-        :sort-by="sortState"
-        @column-sort="onSort"
-        fixed
-        >
-</el-table-v2> -->
 </template>
 
 <script lang="ts" setup>
 import { MyTable } from '@/components/test'
-import { ref, h, reactive, cloneVNode } from 'vue'
+import { ref, h, reactive, cloneVNode, unref } from 'vue'
 import { TableV2SortOrder } from 'element-plus'
+const num = reactive({
+  key: 'id',
+  order: 1
+});
 const generateData = (
   columns,
   length = 200,
@@ -66,45 +64,26 @@ const columns = [
     width: 200,
   },
 ]
-  // let data = generateData(columns, 100)
-  // //设置排序
-  // columns[0].sortable = true
-  // const sortState = ref({
-  //   key: 'id',
-  //   order: TableV2SortOrder.ASC,
-  // })
-  
-  // const onSort = (sortBy) => {
-  //   console.log(sortBy)
-  //   data = data.reverse()
-  //   sortState.value = sortBy
-  // }
 
 let data = ref(generateData(columns, 100))
-columns[0].sortable = true;
-columns[1].sortable = true;
-const sortState = ref({
-  'id': TableV2SortOrder.DESC,
-  'name': TableV2SortOrder.ASC,
-})
-const onSort = ({ key, order }: SortBy) => {
-  sortState.value[key] = order
-  data.value = data.value.reverse()
+
+let timer = null;
+let index = 101;
+const add = () => {
+  timer = setInterval(() => {
+    data.value.unshift({
+        id: index,
+        name: `name${index}`,
+        other: `other${index}`,
+        parentId: null
+    })
+    index++;
+  }, 100)
+}
+const stop = () => {
+  clearInterval(timer)
 }
 
-// let data = generateData(columns, 100)
-// columns[0].sortable = true;
-// columns[1].sortable = true;
-// const sortState = ref({
-//   'id': TableV2SortOrder.DESC,
-//   'name': TableV2SortOrder.ASC,
-// })
-// const onSort = ({ key, order }: SortBy) => {
-//   sortState.value[key] = order;
-//   console.log("onSort")
-//   data = [];
-//   console.log(data)
-// }
 </script>
 <style scoped>
 header {
